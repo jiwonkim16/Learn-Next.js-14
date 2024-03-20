@@ -1,3 +1,5 @@
-export default function Tomato(){
-    retrun <h1>Hello Nextjs</h1>;
+function Tomato() {
+  return <h1>Hello Next.js!!</h1>;
 }
+
+export default Tomato;
