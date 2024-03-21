@@ -1,5 +1,12 @@
+import Navigation from "../components/navigation";
+
 function Page() {
-  return <h1>Hello Next.js!!</h1>;
+  return (
+    <div>
+      <Navigation />
+      <h1>Hello</h1>
+    </div>
+  );
 }
 
 export default Page;
@@ -30,3 +37,9 @@ export default Page;
 // 왜냐면 page 라는 파일을 만들지 않는 이상 실제 경로에 포함되지도 렌더링되지도 않기 때문이다. 그렇기 때문에 권장하지는 않는다.
 // 즉, page 라는 파일을 갖고 있지 않으면 url이 될 수 없다. 단순히 컴포넌트에 불과해진다. 그래서 url을 정의하는 app 폴더 안에
 // 컴포넌트 관련 폴더를 만드는 것은 권장하진 않지만 가능은 하다!
+// --------------------------------------------------
+
+// not-found.tsx
+// app 폴더의 root 경로에 위 이름의 파일을 만들어주면
+// 페이지를 찾을 수 없을 경우 위 파일의 UI가 렌더링 된다.
+// not-found 또한 page, layout 과 같이 특별한 파일명이다.
