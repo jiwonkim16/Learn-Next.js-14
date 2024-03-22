@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 
 function Navigation() {
   const path = usePathname();
-
+  const [count, setCount] = useState(0);
   return (
     <nav>
       <ul>
@@ -16,6 +16,9 @@ function Navigation() {
         <li>
           <Link href="/about-us">About-us</Link>
           {path === "/about-us" ? "🔥" : ""}
+        </li>
+        <li>
+          <button onClick={() => setCount((prev) => prev + 1)}>{count}</button>
         </li>
       </ul>
     </nav>
@@ -39,6 +42,8 @@ export default Navigation;
 
 // 그런데 client component 가 무엇이고 왜 use client 를 추가하니 정상적으로 동작하는지에 대해 알기 위해서는
 // client component와 server component에 대해 알아야 한다.
+
+// -------------------------------------------------------------------------------------
 
 // 그 전에 먼저, CSR 과 SSR의 차이, 즉 next.js가 application을 render 하는 방식을 이해해야 한다.
 // 여기서 렌더링이란 next.js가 내 react component를 가져와서 브라우저가 이해할 수 있는 html로 변환하는 것을 말한다.
@@ -68,4 +73,36 @@ export default Navigation;
 // 하나 기억해야 할 것은 이것이 client component이건 server component이건 간에 모든 컴포넌트에서 발생한다는 것이다.
 // use client가 작성되어 있더라도 server side rendering 이 일어난다.
 
-//
+// -------------------------------------------------------------------------------------
+
+// hydration : dummy HTML을 React application으로 초기화(initalize)하는 작업이다.
+// 즉, Next.js는 초기 Html 파일을 먼저 전달하고 이후 HTML 요소들을 React 컴포넌트로 변환 및 이벤트리스너를 부착하여 React DOM에서 관리하게 한다.
+// 이 과정을 Hydration(수분 보충)이라고 한다.
+
+// 위에서 SSR 방식을 설명할 때 next.js가 그 페이지와 컴포넌트들을 기본적으로 백엔드에서 render 하는 것, 즉 next.js가 코드를
+// HTML로 변환하고 그걸 브라우저에 넘김으로서 자바스크립트가 react 코드를 읽고 실행시키는 것을 기다리지 않아도 사용자는 최소한의 HTML을 볼 수 있다고 했다.
+// 이번엔 사용자가 최초 HTML을 본 뒤에 어떤 일(React가 언제 활성화되는지 등)이 발생하는 과정을 hydration이라 하고 그 과정에 대해 알아보면 다음과 같다.
+// 만약 자바스크립트를 비활성화 해놓은 상태에서 Home이나 about-us 페이지로 이동하게 되면 a태그를 누르는 것이기 때문에
+// 페이지 전체가 새로고침되는 것을 볼 수 있다.
+// 그런데 자바스크립트를 활성화 해둔 상태에서 nav bar의 Home이나 about-us 를 클릭하게 되면 새로고침이 되지 않는다.
+// 이건 바로 React가 hydrated 된 것이다. nav bar의 링크들이 처음에는 anchors 묶음이었다가 React component로 변환된 것이다.
+// 그래서 클릭이 발생되어도 React가 끼어듦으로서 페이지 전체를 reload하지 않고 빠르게 navigate 할 수 있게 된다.
+// 이제 더이상 일반적인 a 태그가 아닌 Link component가 되며, 이 링크 컴포넌트는 client side only navigation을 수행하고 있다.
+// 물론 소스코드에 보면 a 태그가 존재하겠지만 그 a 태그는 자바스크립트에 의해 제어되고 있는 상태이다.
+
+// 정리하자면 사용자가 /about-us 페이지에 접근한다면 next.js는 그 요청을 보고 component를 dummy HTML로 변환한다.
+// 그것이 사용자에게 주어지고 페이지에 도착하는 즉시, 프레임워크는 load를 시작하고 dummy HTML에 새로운 React application을 초기화/initalize 한다.
+// 그러고 나면 이제 React가 app을 넘겨받고 hard refresh 없이 navigate 할 수 있다.
+
+// 그런데 만약 프레임워크가 initalize하는데에 아주 긴 시간이 걸린다면 사용자는 여전히 페이지 사이를 navigate 할 수 있지만
+// 아직 React component가 아니기 때문에 hard refresh가 되며, 자바스크립트가 로드되는 순간 이 네이게이션들은 interactive 해지고
+// React component가 된다.
+
+// 이번엔 다른 예로 state를 사용한다고 가정해보자!
+// count라는 state를 만들고 초기값을 0으로 설정한 후에 버튼에 count값을 넣어주고 onClick 이벤트를 통해 클릭 시 현재 count 값에서 +1씩 되도록 했다.
+// 이 상태에서 사용자가 해당 페이지에 도착하면 next.js는 초기값이 0으로 설정된 button을 사용자에게 먼저 보여줄 것이다.
+// 만약 백엔드 단에서 프레임워크가 initalize 하는데 오랜 시간이 걸린다면 그동안 버튼을 클릭해도 초기값인 0에서 아무 변화도 없을 것이다.
+// 왜냐하면 아직 이 버튼에 eventListener가 연결되지 않았기 때문이다.
+
+// 그런데 이후 자바스크립트가 로드된다면 즉, next.js를 로딩하고 프레임워크를 초기화한다면 React가 버튼에 eventListener를 연결시키고 state 같은 것들과 연결시킴으로써
+// 이 버튼은 interactive 해지고 eventListener가 추가됨으로서 원하는 대로 동작할 것이다.
