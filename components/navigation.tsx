@@ -127,7 +127,7 @@ export default Navigation;
 // hydrate 되어야 한다고 말하는 것이며, 따라서 초기 load에서 next.js는 이 컴포넌트를 render 할 것이다.
 // 그리고 HTML을 사용자에게 주고나서 eventListener들을 추가할 컴포넌트를 hydrate 할 것이다.
 
-// 정리하자면 가장 중요한 것은 use client는 오직 client에서만 render 된다는 것을 의미하는게 아니라
+// 정리하자면 기억해야 할 것은 use client는 오직 client에서만 render 된다는 것을 의미하는게 아니라
 // backend에서 render 되고 frontend 에서 hydrate 됨을 의미한다는 점이다!!!
 
 // -------------------------------------------------------------------------------------
@@ -140,3 +140,24 @@ export default Navigation;
 // 없을 경우 사용자에게 이 컴포넌트를 위한 코드를 다운로드 받게끔 할 필요가 있을까?
 // 그럴 필요가 없기 때문에 사용자가 받아야할 자바스크립트 코드의 양이 줄어든다는 의미이다.
 // 그러면 자연스레 페이지는 로딩속도가 빨라진다.
+
+// -------------------------------------------------------------------------------------
+
+// Recap (요약)
+// 사용자가 페이지로 접근했을 때 next.js는 사용자에게 응답을 주기 전에 백엔드에서 application을 pre render 한다.
+// 그 과정에서 모든 컴포넌트를 가져가서 non interactive 한 HTML로 바꿀 것이다.
+// 그리고 그것을 사용자에게 준다.
+// 그리고나서 프레임워크와 React.js를 initalize 하는데 이 과정에서 use client 명령어를 가진 컴포넌트가 hydrate된다.
+// 여기서 use client 명령어는 프레임워크에게 해당 컴포넌트가 interactive 하다는 것을 알려준다.
+// 그건 즉, 프론트엔드에서 hydrate 되어야 한다는 의미이다.
+// hydration은 우리가 받은 HTML의 위에서 React application을 실행한다는 뜻이다.
+// use client 명령어가 없는, 즉 interactive 하지 않은 컴포넌트들은 hydrate 과정을 거치지 않는다.
+// 이러한 선택적 hydrate 과정을 거침으로서 사용자들이 다운받아야 할 자바스크립트 코드의 양이 줄어든다는 이점이 있다.
+
+// client component, server component 모두 백엔드에서 먼저 server side render로 pre render 된다.
+// 다만, use client 명령어가 있는 컴포넌트는 오직 client에서만 render 된다는 것을 의미하는게 아니라
+// backend에서 render 되고 frontend 에서 hydrate 됨을 의미한다는 점이다!!!
+
+// 그렇다면 server component 안에 client component를 가질 수 있을까??
+// 물론 가능하다.
+// 다만, 반대로 client component 안에는 server component를 가질 수 없다.
