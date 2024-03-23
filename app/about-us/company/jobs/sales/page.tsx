@@ -1,4 +1,6 @@
-import React from "react";
+export const metadata = {
+  title: "Sales",
+};
 
 function Page() {
   return <h1>Sales</h1>;
