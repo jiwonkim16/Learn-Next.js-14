@@ -1,8 +1,8 @@
-// File: /Users/jiwonkim/Desktop/nomad/learn-nextjs14/app/about-us/page.tsx
-import * as entry from '../../../../app/about-us/page.js'
+// File: /Users/jiwonkim/Desktop/nomad/learn-nextjs14/app/(movies)/movies/[id]/page.tsx
+import * as entry from '../../../../../../app/(movies)/movies/[id]/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
-type TEntry = typeof import('../../../../app/about-us/page.js')
+type TEntry = typeof import('../../../../../../app/(movies)/movies/[id]/page.js')
 
 // Check that the entry is a valid entry
 checkFields<Diff<{
