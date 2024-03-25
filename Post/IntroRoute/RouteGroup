@@ -1,0 +1,6 @@
+Route Groups : routes를 그룹화해서 logical groups로 만들 수 있는 방법이다.
+예를 들어 Root 경로에 layout.tsx, not-found.tsx, page.tsx 파일이 있다고 가정했을 때,
+여기서 페이지와 관련된 파일은 page.tsx 뿐이다.
+그래서 이를 route group으로 지정해주고 싶다면 (home) 과 같은 식으로 폴더 이름을 괄호로 묶어준다.
+이런 식으로 폴더 이름을 지정해주게 되면 URL을 바꾸거나 하지 않는다.
+또한 괄호 폴더는 URL에 전혀 영향을 미치지 않는다.
