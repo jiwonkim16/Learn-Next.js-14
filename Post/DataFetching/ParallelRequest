@@ -1,0 +1,72 @@
+이번엔 '634492' 와 같은 id 값으로 데이터를 fetch 해오는 방법에 대해 알아보려 한다.
+
+그러기 위해서 먼저 컴포넌트를 async function으로 만든다.
+그 다음 fetch 함수를 작성한다.
+
+그리고 URL 주소에 id 값을 붙여준다.
+
+코드는 아래와 같다.
+
+import { URL } from "../../../(home)/page";
+
+async function getMovie(id: string) {
+  const response = await fetch(`${URL}/${id}`);
+  return response.json();
+}
+
+async function MovieDetail({ params: { id } }: { params: { id: string } }) {
+  const movie = await getMovie(id);
+  return <h1>{movie.title}</h1>;
+}
+
+export default MovieDetail;
+
+id에 해당하는 영화의 제목이 화면에 출력되게 된다.
+여기까지는 저번에 알아본 서버 컴포넌트에서의 데이터 fetch 방식과 크게 다르지 않다.
+
+
+
+그렇다면 만약 영화의 예고편도 fetch 하고 싶다면 어떻게 할까?
+예고편을 fetch 하는 함수를 만들고 똑같이 처리하면 되지 않을까 싶어서 아래와 같이 작성해봤다.
+
+import { URL } from "../../../(home)/page";
+
+async function getMovie(id: string) {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  const response = await fetch(`${URL}/${id}`);
+  return response.json();
+}
+
+async function getVideos(id: string) {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  const response = await fetch(`${URL}/${id}/videos`);
+  return response.json();
+}
+
+async function MovieDetail({ params: { id } }: { params: { id: string } }) {
+  const movie = await getMovie(id);
+  const video = await getVideos(id);
+  return (
+    <>
+      <h1>{movie.title}</h1>
+    </>
+  );
+}
+
+export default MovieDetail;
+
+여기서 문제가 발생하는데 getMovie와 getVideos가 순차적으로 이루어진다는 것이다.
+즉, getMovie가 먼저 호출되고 이 함수가 완료되어야만 getVideos 함수가 실행된다는 것이다.
+그래서 getMovie 함수가 완료되는데까지 시간이 오래걸린다면 사용자는 예고편도 그 시간이 지난 뒤에야 볼 수 있을 것이다.
+
+나는 이런 두 함수를 병렬로 실행시키고 싶다.
+이를 위해 Promise.all 을 사용할 것이다.
+Promise.all을 사용한다면 getMovie와 getVideos를 동시에 await 할 수 있다.
+
+아래와 같이 Promise.all이라고 적어주고 안에 Promise들의 array를 써준다.
+const [movie, video] = await Promise.all([getMovie(id), getVideos(id)])
+그래서 일어날 일은 Promise.all이 getMovie를 await할 것이고 이 작업이 끝나면 첫번째 항목인 movie 값이 오며,
+getVideos도 await 하고 작업이 끝나면 두번째 항목인 video 값이 올 것이다.
+그리고 결과값으로 이루어진 array를 준다. 
+
+이렇게 함으로서 동시에 함수가 실행된다.
