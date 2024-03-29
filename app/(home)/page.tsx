@@ -1,22 +1,17 @@
-"use client";
+export const metadata = {
+  title: "Home",
+};
+const URL = "https://nomad-movies.nomadcoders.workers.dev/movies";
 
-import { useEffect, useState } from "react";
-
-function Page() {
-  const [movies, setMovies] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const getMovies = async () => {
-    const response = await fetch(
-      "https://nomad-movies.nomadcoders.workers.dev/movies"
-    );
-    const json = await response.json();
-    setMovies(json);
-    setIsLoading(false);
-  };
-  useEffect(() => {
-    getMovies();
-  }, []);
-  return <div>{isLoading ? "Loading..." : JSON.stringify(movies)}</div>;
+async function getMovies() {
+  const response = await fetch(URL);
+  const json = await response.json();
+  return json;
 }
 
-export default Page;
+async function HomePage() {
+  const movies = await getMovies();
+  return <div>{JSON.stringify(movies)}</div>;
+}
+
+export default HomePage;

@@ -1,0 +1,83 @@
+이번엔 서버 컴포넌트에서 데이터를 fetch하는 방법에 대해 알아볼건데
+
+이전에 client 컴포넌트 에서 만들었던 코드를 다 삭제하고 메타데이터를 포함한 아래 코드들만 남겨놓은 상태에서 데이터를 fetch 할건데
+client 컴포넌트에서 하던 방식과 달리 컴포넌트 안에 없어도 된다.
+
+export const metadata = {
+  title: "Home",
+};
+const URL = "https://nomad-movies.nomadcoders.workers.dev/movies";
+
+function Page() {
+
+
+  return <div>{JSON.stringify(movies)}</div>;
+}
+
+export default Page;
+
+
+위 코드에서 데이터를 fetch하는 getMovies 라는 함수를 컴포넌트 바깥에 만들어주면 아래와 같다. 이 단계까지는 클라이언트 컴포넌트와 거의 동일하다.
+
+export const metadata = {
+  title: "Home",
+};
+const URL = "https://nomad-movies.nomadcoders.workers.dev/movies";
+
+async function getMovies() {
+  const response = await fetch(URL);
+  const json = await response.json();
+  return json
+}
+
+function Page() {
+  return <div>{JSON.stringify(movies)}</div>;
+}
+
+export default Page;
+
+여기까지 하면 서버 컴포넌트에서 데이터를 fetch 하는 함수를 만들었지만 아직 컴포넌트와 연결된 상태는 아니다.
+
+그리고나서 뭘할거나면 이 Page를 async function으로 바꿔줄 것이다.
+왜냐하면 어떤 일이 발생하기를 기다리려고 await를 사용하고 싶기 때문이다!
+
+그리고 나서 컴포넌트 바깥에 만들어 두었던 함수를 가져와서 아래와 같이 작성하면 끝이다!
+
+export const metadata = {
+  title: "Home",
+};
+const URL = "https://nomad-movies.nomadcoders.workers.dev/movies";
+
+async function getMovies() {
+  const response = await fetch(URL);
+  const json = await response.json();
+  return json;
+}
+
+async function HomePage() {
+  const movies = await getMovies();
+  return <div>{JSON.stringify(movies)}</div>;
+}
+
+export default HomePage;
+
+위 코드에서 일어난 일은 브라우저가 어떤 것도 fetch 하지 않았으며, (network 탭에서 무비 관련 API를 볼 수 없다.)
+백엔드에서 발생한 것이다.
+
+useState, useEffect가 필요 없어졌으며, 이 HomePage로 이동 시에 파비콘에 로딩상태도 볼 수 없을 것이다.
+왜냐하면 next.js는 프레임워크이기 때문이다.
+무슨 의미냐하면 서버 컴포넌트를 사용함으로서 fetch된 url을 자동으로 캐싱함으로서 한번만 가져오면 끝이다.
+물론 처음 접속 시에는 로딩상태가 존재한다. 다만, 한번 fetch하고 나면 그 값이 캐싱되어 있기 때문에 다른 페이지를 갔다가 다시 돌아왔을 땐(새로고침 등)
+서버 컴포넌트에서 Next.js가 내가 fetch한 것을 기억하기 때문에 첫번째 fetch만 API에 요청하는 것 뿐,
+그 이후엔 이미 fetch된 데이터를 활용하는 것이다.
+
+이제 백엔드 쪽에서 api를 처리한다는 것까진 이해가 됬는데 만약에 데이터베이스 등의 문제로 5초간 딜레이가 걸린다면 어떤 현상이 나타날까?
+파비콘에서 로딩중이라는 것을 보여주고 페이지는 들어가지지도 않을 것이다.
+그럼 clietn side와 비교했을 때 치명적일 것이다. 
+일반적으로 로딩 상태라는 것을 UI에서 볼 수 있으면 좋겠고.. 최소한 데이터는 모르겠지만 nav bar 같은 기본적인 구성요소들은 보여줬으면 한다.
+
+이런 경우에 사용할 수 있는 것이 Loading component이다 ㅎㅎ
+
+
+
+
