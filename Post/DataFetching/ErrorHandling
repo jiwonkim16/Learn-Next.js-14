@@ -1,0 +1,28 @@
+만약에 데이터를 fetching 하는 과정에서 통신이 끊기는 등의 문제로 에러가 발생했을 때 어떻게 해야하는지에 대해 알아보면 다음과 같다.
+
+async function getMovie(id: string) {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  throw new Error("something broke...");
+  //   const response = await fetch(`${URL}/${id}`);
+  //   return response.json();
+}
+
+위처럼 info정보를 받아오는 과정에서 2초간 fetch 후 에러가 발생하게끔 한다면
+페이지 전체가 보이지 않을 것이며, 사용자는 무슨 일이 일어났는지도 알지 못한다.
+이는 사용자 경험을 해치는 행위가 될 것이다.
+또한, 하나의 페이지에서 error 발생 시 다른 전체 페이지에는 영향을 미쳐서는 안된다.
+
+이를 해결하기 위해선 매우 간단하다. 
+info 페이지와 동일한 경로에 error.tsx 파일을 생성한다.
+그리고 아래와 같이 컴포넌트 이름은 마음대로 붙여줘도 된다. (파일명은 error로 고정!!)
+
+function ErrorOmg() {
+  return <div>ErrorOmg</div>;
+}
+
+export default ErrorOmg;
+
+그리고 에러가 발생한 페이지에 가보면 에러 컴포넌트에는 use client를 붙여줘야 한다는 메세지를 볼 수 있다.
+즉, 에러 컴포넌트에는 반드시 use client 작성해야 한다.
+
+그리고 나서 보면 해당 페이지에만 에러가 발생했고 다른 페이지에는 영향을 미치지 않은 것을 볼 수 있다!
