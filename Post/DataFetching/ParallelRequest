@@ -70,3 +70,5 @@ getVideos도 await 하고 작업이 끝나면 두번째 항목인 video 값이 �
 그리고 결과값으로 이루어진 array를 준다. 
 
 이렇게 함으로서 동시에 함수가 실행된다.
+
+사실 이건 React의 특징이고 Next.js엔 더 좋은 방법이 있는데 바로 Suspense이다.

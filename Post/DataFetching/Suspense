@@ -1,0 +1,127 @@
+Promise.all을 이용해서 병렬적으로 fetch하는 방법을 알아봤는데
+Promise를 동시에 실행하는 이 방식으로 fetch하는 시간을 단축했고 순차적이지 않게 되었다.
+
+다만, 여전히 문제가 있는데 아래 코드에서 getMovie와 getVideos가 완료되어야만 UI를 볼 수 있었다.
+그래서 이를 해결하기 위해서 fetch 함수를 분리하는 방법에 대해 알아보고자 한다.
+
+async function getMovie(id: string) {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  const response = await fetch(`${URL}/${id}`);
+  return response.json();
+}
+
+async function getVideos(id: string) {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  const response = await fetch(`${URL}/${id}/videos`);
+  return response.json();
+}
+
+async function MovieDetail({ params: { id } }: { params: { id: string } }) {
+  const movie = await getMovie(id);
+  const video = await getVideos(id);
+  return (
+    <>
+      <h1>{movie.title}</h1>
+    </>
+  );
+}
+
+둘 다 끝날 때까지 기다린 후 사용자가 UI를 보는 대신에
+둘 중 어느 한쪽도 기다릴 필요없이 둘다 동시에 시작해서 getMovie가 준비되면 movie에 대한 UI를 보여주고
+getVideos가 준비되면 video에 대한 UI를 보여주도록 분리해볼 것이다.
+
+기본적으로 데이터 소스가 적다면, 즉 fetch해야 할 데이터가 많지 않다면 page에서 데이터를 fetch하는 것이 간편하다.
+다만, 반대로 데이터 소스가 많다면 Suspense를 써야 한다.
+
+이를 위해 movie-video 컴포넌트를 별도로 만들고 이건 비디오만을 렌더링하는 컴포넌트가 될 것이다.
+
+async function getVideos(id: string) {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  const response = await fetch(`${URL}/${id}/videos`);
+  return response.json();
+}
+
+export default async function MovieVideos({ id }: { id: string }) {
+  const videos = await getVideos(id);
+  return <h6>{JSON.stringify(videos)}</h6>;
+}
+
+
+그리고 영화 정보에 대해서도 똑같이 해준다. component 폴더에 movie-info 이름으로 파일을 하나 생성하고 아래와 같이 작성한다.
+왜냐하면 디테일 페이지가 2가지를 fetch하기 때문이다. (영화정보, 예고편 등 비디오)
+
+async function getMovie(id: string) {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  const response = await fetch(`${URL}/${id}`);
+  return response.json();
+}
+
+export default async function MovieInfo({ id }: { id: string }) {
+  const movie = await getMovie(id);
+  return <h6>{JSON.stringify(movie)}</h6>;
+}
+
+지금까지 한 것은 2개의 컴포넌트를 만들었고 이 2개의 컴포넌트는 모두 async fucntion이며, server component이면서 자신에 관한 데이터만 fetch 하고 있다.
+
+그리고 page에서는 아래와 같이 컴포넌트 2개를 붙여넣어준다.
+
+import MovieInfo from "../../../../components/movie-info";
+import MovieVideos from "../../../../components/movie-videos";
+
+async function MovieDetail({ params: { id } }: { params: { id: string } }) {
+  return (
+    <>
+      <div>
+        <MovieInfo id={id} />
+        <MovieVideos id={id} />
+      </div>
+    </>
+  );
+}
+
+export default MovieDetail;
+
+
+이전과 비교해보면 전에는 page component에서 2가지 모두 fetch 했었는데 지금은 각각의 컴포넌트로 분리했으며 둘 다 async이고 둘 다 await해서
+자신에 관한 데이터를 fetch 한다.
+
+그리고 movie info와 movie video 각각 개별적으로 기다릴 수 있게 하기 위해서
+
+이 2개의 컴포넌트는 각각 Suspense 컴포넌트(react로 부터 가지고 온) 로 감싸주어야 하며,
+Suspense 컴포넌트는 fallback 이라는 prop이 있고 이건 컴포넌트가 await 되는 동안 표시할 메세지를 render 할 수 있게 해준다.
+
+import { Suspense } from "react";
+import MovieInfo from "../../../../components/movie-info";
+import MovieVideos from "../../../../components/movie-videos";
+
+async function MovieDetail({ params: { id } }: { params: { id: string } }) {
+  return (
+    <>
+      <div>
+        <Suspense fallback={<h1>Loading movie info</h1>}>
+          <MovieInfo id={id} />
+        </Suspense>
+        <Suspense fallback={<h1>Loading movie video</h1>}>
+          <MovieVideos id={id} />
+        </Suspense>
+      </div>
+    </>
+  );
+}
+
+
+그래서 일어나는 일은 기본적으로 Suspense가 데이터를 fetch 하기 위해 이 안의 component를 await하는 것이며,
+fetch 중에는 fallback 의 내용을 render 한다. 그리고 끝나고 나면 실제 UI가 보여진다.
+
+지금까지 작성해놓은 코드를 실행시켜보면 특정 영화 제목을 클릭하고 해당 영화 상세 페이지로 들어가게 되면
+2개의 로딩 상태를 볼 수 있다. (info와 video)
+
+그리고 video가 먼저 들어오고 info가 들어오거나 info가 들어오고나서 video가 들어오는 등 UI를 볼 수 있다.
+
+이것의 장점은 병렬적으로 2가지를 동시에 fetch할 수 있다는 것이고 하나의 요청이 완료되면 다른 컴포넌트를 기다릴 필요없이 즉시 render 된다는 점이다!
+
+그리고 page에서는 데이터 fetching이 발생하지 않기 때문에 loading 파일은 아무것도 하지 않는다.
+(await 하는 것이 없다..)
+그렇기 때문에 전에는 loading 파일이 전체 페이지의 UI를 완전히 대체했다면 Suspense를 사용함으로서 await 하는 것이 없기 때문에
+하는 역할이 없어진다.
+대신 Suspense가 구체적으로 페이지의 어느부분이 로딩상태여야 하는지를 명시해주고 있다.
