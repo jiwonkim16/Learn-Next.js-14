@@ -2,12 +2,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
+import styles from "../components/navigation.module.css";
 
 function Navigation() {
   const path = usePathname();
   const [count, setCount] = useState(0);
   return (
-    <nav>
+    <nav className={styles.nav}>
       <ul>
         <li>
           <Link href="/">Home</Link>
