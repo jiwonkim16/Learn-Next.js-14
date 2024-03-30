@@ -6,7 +6,7 @@ import styles from "../components/navigation.module.css";
 
 function Navigation() {
   const path = usePathname();
-  const [count, setCount] = useState(0);
+  // const [count, setCount] = useState(0);
   return (
     <nav className={styles.nav}>
       <ul>
@@ -18,9 +18,9 @@ function Navigation() {
           <Link href="/about-us">About-us</Link>
           {path === "/about-us" ? "🔥" : ""}
         </li>
-        <li>
+        {/* <li>
           <button onClick={() => setCount((prev) => prev + 1)}>{count}</button>
-        </li>
+        </li> */}
       </ul>
     </nav>
   );
