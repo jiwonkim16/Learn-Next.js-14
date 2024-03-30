@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useState } from "react";
 import styles from "../components/navigation.module.css";
 
 function Navigation() {

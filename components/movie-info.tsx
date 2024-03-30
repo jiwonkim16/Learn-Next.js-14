@@ -1,10 +1,10 @@
-import { URL } from "../app/contants";
+import { API_URL } from "../app/contants";
 import potato from "../components/movie-info.module.css";
 
 export async function getMovie(id: string) {
   await new Promise((resolve) => setTimeout(resolve, 2000));
   // throw new Error("something broke...");
-  const response = await fetch(`${URL}/${id}`);
+  const response = await fetch(`${API_URL}/${id}`);
   return response.json();
 }
 
