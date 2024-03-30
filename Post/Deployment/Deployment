@@ -7,3 +7,13 @@
 2. start
 이 명령어는 어플리케이션을 production 모드로 시작해줄것이다.
 "start" : "next start"
+
+
+-----------------------
+
+주의할 점으로 이대로 배포를 진행하다보면 빌드 과정에서 Type error: Page "app/(home)/page.tsx" does not match the required types of a Next.js Page.
+  "URL" is not a valid Page export field. 라고 하면서 URL을 export 할 수 없다고 에러가 발생하는데
+당연하게도 page.tsx에서는 아무거나 export 할 수 없다.
+오직 허용된 것들만 export 할 수 있다.
+
+그래서 URL 변수를 새로운 constants 파일로 옮겨 줄 것이다.
