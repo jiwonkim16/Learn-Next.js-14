@@ -7,10 +7,10 @@ export const metadata = {
 영화페이지는 페이지 제목이 api를 통해서 주어지기 때문에 동적이어야 한다.
 
 그래서 하나의 async 함수를 만들고 그 함수를 export 할 것이다. 
-함수의 이름은 generateMetadata라고 지어주도록 하겠다.
+함수의 이름은 generateMetadata라고 지어주어야 한다!!!
 이 함수는 영화를 fetch해올 것이고 영화들의 제목을 반환할 것이다.
 
-즉, 이 generateMetadata라는 함수는 동적인 제목을 갖고 있는 페이지를 위해 존재하는 함수이다.
+즉, 이 generateMetadata라는 함수는 동적인 제목을 갖고 있는 페이지를 위해 존재하는 특수 함수이다.
 
 export async function generateMetadata() {
   return {

@@ -1,0 +1,9 @@
+배포하기 전에 package.json에서 2개의 명령어를 더 설정해주어야 한다.
+
+1. build
+이 명령어가 내 어플리케이션을 실제로 production용으로 만들어 줄 것이다.
+"build" : "next build"
+
+2. start
+이 명령어는 어플리케이션을 production 모드로 시작해줄것이다.
+"start" : "next start"
