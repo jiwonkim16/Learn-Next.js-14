@@ -1,0 +1,58 @@
+기존 home, about-us 페이지는 아래와 같이 고정적인 metadata title을 가지고 있지만
+
+export const metadata = {
+  title: "Home",
+};
+
+영화페이지는 페이지 제목이 api를 통해서 주어지기 때문에 동적이어야 한다.
+
+그래서 하나의 async 함수를 만들고 그 함수를 export 할 것이다. 
+함수의 이름은 generateMetadata라고 지어주도록 하겠다.
+이 함수는 영화를 fetch해올 것이고 영화들의 제목을 반환할 것이다.
+
+즉, 이 generateMetadata라는 함수는 동적인 제목을 갖고 있는 페이지를 위해 존재하는 함수이다.
+
+export async function generateMetadata() {
+  return {
+    title : "lalalala"
+  }
+}
+
+그렇다면 이 함수는 사용자가 어떤 영화를 보고 있는지 어떻게 판단할 수 있는가?
+MovieDetail 컴포넌트는 params에서 url의 id를 props로 전달받아서 구분을 했는데
+이 함수도 마찬가지로 params와 id를 지정해주면 된다.
+
+import { Suspense } from "react";
+import MovieInfo, { getMovie } from "../../../../components/movie-info";
+import MovieVideos from "../../../../components/movie-videos";
+
+interface IParams {
+  params: { id: string };
+}
+
+export async function generateMetadata({ params: { id } }: IParams) {
+  const movie = await getMovie(id);
+  return {
+    title: movie.title,
+  };
+}
+
+async function MovieDetail({ params: { id } }: IParams) {
+  return (
+    <>
+      <div>
+        <Suspense fallback={<h1>Loading movie info</h1>}>
+          <MovieInfo id={id} />
+        </Suspense>
+        <Suspense fallback={<h1>Loading movie video</h1>}>
+          <MovieVideos id={id} />
+        </Suspense>
+      </div>
+    </>
+  );
+}
+
+export default MovieDetail;
+
+
+

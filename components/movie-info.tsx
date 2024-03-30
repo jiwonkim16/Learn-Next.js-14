@@ -1,7 +1,7 @@
 import { URL } from "../app/(home)/page";
 import potato from "../components/movie-info.module.css";
 
-async function getMovie(id: string) {
+export async function getMovie(id: string) {
   await new Promise((resolve) => setTimeout(resolve, 2000));
   // throw new Error("something broke...");
   const response = await fetch(`${URL}/${id}`);
